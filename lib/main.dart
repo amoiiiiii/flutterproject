@@ -1,122 +1,117 @@
+import 'package:belajar_flutter/gridview/grid_count.dart';
+import 'package:belajar_flutter/gridview/latihan-grid.dart';
 import 'package:belajar_flutter/navigator.dart';
-
-
+import 'package:belajar_flutter/screens/booking.dart';
+import 'package:belajar_flutter/screens/detail_flora_screen.dart';
+import 'package:belajar_flutter/screens/flora_screen.dart';
+import 'package:belajar_flutter/screens/form_screen.dart';
+import 'package:belajar_flutter/screens/home_screens.dart';
+import 'package:belajar_flutter/screens/login_screen.dart';
+import 'package:belajar_flutter/screens/output_login.dart';
+import 'package:belajar_flutter/screens/register_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-
-// void main() {
-//   runApp(const MyApp());
-// }
-
-// class MyApp extends StatelessWidget {
-//   const MyApp({Key? key}) : super(key: key);
-
-//   // This widget is the root of your application.
-//   @override
-//   Widget build(BuildContext context) {
-//     return MaterialApp(
-//       debugShowCheckedModeBanner: false,
-//       title: "Belajar Flutter",
-//       home: Scaffold(
-//         appBar: AppBar(
-//           title: Text("Rahma Ayu Andari"),
-//           backgroundColor: Color.fromARGB(255, 157, 180, 223),
-//           centerTitle: true,
-//         ),
-//         body: Container(
-//           color: Color.fromARGB(255, 232, 223, 238),
-//           child: firstRoute(),
-//         ),
-//       ),
-//     );
-//   }
-// }
-
-// class belajarHelloWorld extends StatelessWidget {
-//   const belajarHelloWorld({
-//     super.key,
-//   });
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return TextWidget();
-//   }
-// }
-
-// class TextWidget extends StatelessWidget {
-//   const TextWidget({
-//     super.key,
-//   });
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Center(
-//       child: Text(
-//         "XII RPL 2", 
-//         style: TextStyle(
-//           fontSize: 24,
-//           fontWeight: FontWeight.bold,
-//           color: Color.fromARGB(255, 243, 63, 123),
-//           ),
-//           ),
-//     );
-    
-//   }
-// }
-     void main() {
-  runApp(MaterialApp(
-    title: 'Named Routes',
-    initialRoute: '/',
-    routes: {
-      '/': (context) => const firstRoute(),
-      '/second': (context) => const secondRoute(),
-    },
-  ));
+void main() {
+  runApp(MyApp());
 }
 
-// ignore: camel_case_types
-class firstRoute extends StatelessWidget {
-  const firstRoute({Key? key}) : super(key: key);
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Nextgen Halaman 1'),
-        backgroundColor: Colors.blue,
-      ),
-      body: Center(
-        child: ElevatedButton(
-          child: const Text('Pergi ke halaman 2'),
-          onPressed: () {
-            Navigator.pushNamed(context, '/second');
-          },
-        ),
-      ),
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: "Ini Project Flutter Pertamaku",
+      home: CheckAuth(),
     );
   }
 }
 
-// ignore: camel_case_types
-class secondRoute extends StatelessWidget {
-  const secondRoute({Key? key}) : super(key: key);
+class CheckAuth extends StatefulWidget {
+  @override
+  _CheckAuthState createState() => _CheckAuthState();
+}
+
+class _CheckAuthState extends State<CheckAuth> {
+  bool isAuth = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkIfLoggedIn();
+  }
+
+  void _checkIfLoggedIn() async {
+    SharedPreferences localStorage = await SharedPreferences.getInstance();
+    var token = localStorage.getString('token');
+    if (token != null) {
+      if (mounted) {
+        setState(() {
+          isAuth = true;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    Widget child;
+    if (isAuth) {
+      child = BottomNavigationMenu();
+    } else {
+      child = LoginScreen();
+    }
+
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Nextgen Halaman 2"),
-        backgroundColor: Colors.blue,
-      ),
-      body: Center(
-        child: ElevatedButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          child: const Text('Kembali!'),
-        ),
-      ),
+      body: child,
     );
   }
 }
 
+class BottomNavigationMenu extends StatefulWidget {
+  const BottomNavigationMenu({super.key});
+
+  @override
+  State<BottomNavigationMenu> createState() => _BottomNavigationMenuState();
+}
+
+class _BottomNavigationMenuState extends State<BottomNavigationMenu> {
+  @override
+  int _selectedTab = 0;
+
+  List _pages = [
+    HomeScreen(),
+    ListFloraScreen(),
+    LoginScreen(),
+    RegisterScreen()
+  ];
+
+  _changeTab(int index) {
+    setState(() {
+      _selectedTab = index;
+    });
+  }
+
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: _pages[_selectedTab],
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedTab,
+        onTap: (index) => _changeTab(index),
+        selectedItemColor: Colors.red,
+        unselectedItemColor: Colors.grey,
+        items: [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.view_stream), label: "Wisata"),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.payment), label: "Beli Tiket"),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.account_box), label: "Profil"),
+        ],
+      ),
+    );
+  }
+}

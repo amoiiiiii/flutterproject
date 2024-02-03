@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class LatihanListView extends StatelessWidget {
-  const LatihanListView({super.key});
+   LatihanListView({super.key});
 
   @override
   Widget build(BuildContext context) {
